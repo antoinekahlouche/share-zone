@@ -25,7 +25,7 @@ const server = Bun.serve({
     try {
       const url = new URL(req.url);
       const route = url.pathname;
-      if (req.method === 'GET' && (route === '/' || ['/static/app.js', '/static/style.css', '/static/favicon.svg'].includes(route))) {
+      if (req.method === 'GET' && (route === '/' || ['/static/app.js', '/static/style.css', '/static/favicon.svg', '/static/apple-touch-icon.png'].includes(route))) {
         return new Response(Bun.file(join(base, route === '/' ? 'templates/index.html' : route.slice(1))));
       }
       if (route === '/api/files' && req.method === 'GET') {
