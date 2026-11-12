@@ -68,12 +68,16 @@ $('drop').ondrop = event => { event.preventDefault(); $('drop').classList.remove
 $('download').onclick = async () => {
   busy = true; updateActions();
   try {
-    const response = await api('/api/download-selected', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ names: [...selection] }) });
-    const objectURL = URL.createObjectURL(await response.blob());
-    const link = document.createElement('a'); link.href = objectURL;
-    const single = items.find(file => file.name === [...selection][0]);
-    link.download = selection.size === 1 && !single?.directory ? single.name : 'share-zone.zip';
-    link.click(); setTimeout(() => URL.revokeObjectURL(objectURL), 60000);
+    const names = [...selection];
+    for (const name of names) {
+      const response = await api('/api/download?path=' + encodeURIComponent(name));
+      const objectURL = URL.createObjectURL(await response.blob());
+      const link = document.createElement('a'); link.href = objectURL;
+      link.download = items.find(file => file.name === name)?.directory ? name + '.zip' : name;
+      document.body.append(link);
+      link.click(); link.remove();
+      setTimeout(() => URL.revokeObjectURL(objectURL), 60000);
+    }
   } catch (error) { report(error); }
   finally { busy = false; updateActions(); }
 };
